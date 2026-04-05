@@ -94,6 +94,7 @@ export default function EconomistBarChart({ data, width, height }) {
       <g
         key={i}
         style={{ cursor: "pointer" }}
+        onClick={() => window.open(d.url, "_blank", "noreferrer")}
         onMouseEnter={() => setHoveredName(d.name)}
         onMouseLeave={() => {
           setHoveredName(null);
@@ -162,11 +163,7 @@ export default function EconomistBarChart({ data, width, height }) {
           {tooltip.description && (
             <div className="tooltip-description">{tooltip.description}</div>
           )}
-          {tooltip.url && (
-            <a className="tooltip-link" href={tooltip.url} target="_blank" rel="noreferrer">
-              Wikipedia →
-            </a>
-          )}
+          <div className="tooltip-hint">Click to open Wikipedia →</div>
         </div>
       )}
     </div>
