@@ -18,12 +18,10 @@ export default function EconomistBarChart({ data, width, height }) {
   const labelOffset = 7;
   const labelThreshold = 8;
   const maxValue = d3.max(data, (d) => d.count);
-  const gridTicks = d3.range(0, Math.ceil(maxValue / 5) * 5 + 1, 5);
+  const maxValueGrid = Math.ceil(maxValue / 5) * 5 + 1;
+  const gridTicks = d3.range(0, maxValueGrid, 5);
 
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(data, (d) => d.count)])
-    .range([0, width - 10]);
+  const xScale = d3.scaleLinear().domain([0, maxValueGrid]).range([0, width]);
 
   const yScale = d3
     .scaleBand()
@@ -32,7 +30,7 @@ export default function EconomistBarChart({ data, width, height }) {
     .padding(0.3);
 
   const header = (
-    <div className="header" style={{ width: width - 40 }}>
+    <div className="header" style={{ width: "87.5%" }}>
       <div className="headerLine" />
       <div className="headerBox" />
       <span className="title">Escape artists</span>
@@ -54,6 +52,10 @@ export default function EconomistBarChart({ data, width, height }) {
     </div>
   );
 
+  const plotBackground = (
+    <rect x={0} y={0} width={width} height={height} className="plot-bg" />
+  );
+
   const gridLines = gridTicks.map((tick, i) => (
     <g key={i}>
       <text x={xScale(tick)} y={-10} className="xAxisText">
@@ -71,7 +73,48 @@ export default function EconomistBarChart({ data, width, height }) {
     </g>
   ));
 
-  // 2️⃣ Render with React (JSX!) using the D3 maths
+  const allBars = data.map((d, i) => {
+    const xLabel = d.count < labelThreshold ? xScale(d.count) : 0;
+    const yLabel = yScale(d.name) + yScale.bandwidth() / 2;
+    const yBar = yScale(d.name);
+    const labelColor =
+      d.count < labelThreshold ? "var(--economist-blue)" : "#fff";
+
+    return (
+      <g key={i}>
+        <rect
+          key={"bar-" + i}
+          x={0}
+          y={yBar}
+          width={xScale(d.count)}
+          height={yScale.bandwidth()}
+          fill={"var(--economist-blue)"}
+          className="bar"
+        />
+        {d.count < labelThreshold && (
+          <rect
+            key={"label-bg-" + i}
+            x={labelOffset + xLabel}
+            y={yBar}
+            width={measureTextWidth(d.name)}
+            height={yScale.bandwidth()}
+            fill="var(--background)"
+            className="label-bg"
+          />
+        )}
+        <text
+          key={"label-" + i}
+          x={labelOffset + xLabel}
+          y={yLabel}
+          style={{ fill: labelColor }}
+          className="label"
+        >
+          {d.name}
+        </text>
+      </g>
+    );
+  });
+
   return (
     <>
       {header}
@@ -81,49 +124,9 @@ export default function EconomistBarChart({ data, width, height }) {
         overflow="visible"
         className="economist-barchart"
       >
-        <rect x={0} y={0} width={width} height={height} className="plot-bg" />
+        {plotBackground}
         {gridLines}
-        {data.map((d, i) => {
-          const xLabel = d.count < labelThreshold ? xScale(d.count) : 0;
-          const yLabel = yScale(d.name) + yScale.bandwidth() / 2;
-          const yBar = yScale(d.name);
-          const labelColor =
-            d.count < labelThreshold ? "var(--economist-blue)" : "#fff";
-
-          return (
-            <g key={i}>
-              <rect
-                key={"bar-" + i}
-                x={0}
-                y={yBar}
-                width={xScale(d.count)}
-                height={yScale.bandwidth()}
-                fill={"var(--economist-blue)"}
-                className="bar"
-              />
-              {d.count < labelThreshold && (
-                <rect
-                  key={"label-bg-" + i}
-                  x={labelOffset + xLabel}
-                  y={yBar}
-                  width={measureTextWidth(d.name)}
-                  height={yScale.bandwidth()}
-                  fill="var(--background)"
-                  className="label-bg"
-                />
-              )}
-              <text
-                key={"label-" + i}
-                x={labelOffset + xLabel}
-                y={yLabel}
-                style={{ fill: labelColor }}
-                className="label"
-              >
-                {d.name}
-              </text>
-            </g>
-          );
-        })}
+        {allBars}
       </svg>
       {footer}
     </>
