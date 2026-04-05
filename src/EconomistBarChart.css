@@ -86,3 +86,23 @@ text {
 .tooltip-value {
   color: #333;
 }
+
+.tooltip-description {
+  margin-top: 6px;
+  color: #555;
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 220px;
+}
+
+.tooltip-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--economist-blue);
+  text-decoration: none;
+}
+
+.tooltip-link:hover {
+  text-decoration: underline;
+}

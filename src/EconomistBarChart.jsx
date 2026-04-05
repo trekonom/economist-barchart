@@ -18,7 +18,7 @@ function measureTextWidth(text) {
 export default function EconomistBarChart({ data, width, height }) {
   const containerRef = useRef(null);
   const [hoveredName, setHoveredName] = useState(null);
-  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "", count: 0 });
+  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "", count: 0, description: "", url: "" });
 
   const labelOffset = 7;
   const labelThreshold = 8;
@@ -101,7 +101,7 @@ export default function EconomistBarChart({ data, width, height }) {
         }}
         onMouseMove={(e) => {
           const rect = containerRef.current.getBoundingClientRect();
-          setTooltip({ visible: true, x: e.clientX - rect.left, y: e.clientY - rect.top, name: d.name, count: d.count });
+          setTooltip({ visible: true, x: e.clientX - rect.left, y: e.clientY - rect.top, name: d.name, count: d.count, description: d.description, url: d.url });
         }}
       >
         <rect
@@ -159,6 +159,14 @@ export default function EconomistBarChart({ data, width, height }) {
         <div className="tooltip" style={{ left: tooltip.x + 12, top: tooltip.y - 28 }}>
           <div className="tooltip-name">{tooltip.name}</div>
           <div className="tooltip-value">{tooltip.count} infections</div>
+          {tooltip.description && (
+            <div className="tooltip-description">{tooltip.description}</div>
+          )}
+          {tooltip.url && (
+            <a className="tooltip-link" href={tooltip.url} target="_blank" rel="noreferrer">
+              Wikipedia →
+            </a>
+          )}
         </div>
       )}
     </div>
