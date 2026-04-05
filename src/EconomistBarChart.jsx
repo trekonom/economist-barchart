@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import * as d3 from "d3";
 import "./EconomistBarChart.css";
 
@@ -15,6 +16,10 @@ function measureTextWidth(text) {
 
 // Initialize React Component
 export default function EconomistBarChart({ data, width, height }) {
+  const containerRef = useRef(null);
+  const [hoveredName, setHoveredName] = useState(null);
+  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "", count: 0 });
+
   const labelOffset = 7;
   const labelThreshold = 8;
   const maxValue = d3.max(data, (d) => d.count);
@@ -83,8 +88,22 @@ export default function EconomistBarChart({ data, width, height }) {
     const labelColor =
       d.count < labelThreshold ? "var(--economist-blue)" : "#fff";
 
+    const isActive = hoveredName === null || hoveredName === d.name;
+
     return (
-      <g key={i}>
+      <g
+        key={i}
+        style={{ cursor: "pointer" }}
+        onMouseEnter={() => setHoveredName(d.name)}
+        onMouseLeave={() => {
+          setHoveredName(null);
+          setTooltip((t) => ({ ...t, visible: false }));
+        }}
+        onMouseMove={(e) => {
+          const rect = containerRef.current.getBoundingClientRect();
+          setTooltip({ visible: true, x: e.clientX - rect.left, y: e.clientY - rect.top, name: d.name, count: d.count });
+        }}
+      >
         <rect
           key={"bar-" + i}
           x={0}
@@ -93,6 +112,8 @@ export default function EconomistBarChart({ data, width, height }) {
           height={yScale.bandwidth()}
           fill={"var(--economist-blue)"}
           className="bar"
+          opacity={isActive ? 1 : 0.3}
+          style={{ transition: "opacity 150ms ease" }}
         />
         {d.count < labelThreshold && (
           <rect
@@ -103,13 +124,15 @@ export default function EconomistBarChart({ data, width, height }) {
             height={yScale.bandwidth()}
             fill="var(--background)"
             className="label-bg"
+            opacity={isActive ? 1 : 0.3}
+            style={{ transition: "opacity 150ms ease" }}
           />
         )}
         <text
           key={"label-" + i}
           x={labelOffset + xLabel}
           y={yLabel}
-          style={{ fill: labelColor }}
+          style={{ fill: labelColor, opacity: isActive ? 1 : 0.3, transition: "opacity 150ms ease" }}
           className="label"
         >
           {d.name}
@@ -119,7 +142,7 @@ export default function EconomistBarChart({ data, width, height }) {
   });
 
   return (
-    <>
+    <div className="chart-container" ref={containerRef} style={{ position: "relative" }}>
       {header}
       <svg
         width={width}
@@ -132,6 +155,12 @@ export default function EconomistBarChart({ data, width, height }) {
         {allBars}
       </svg>
       {footer}
-    </>
+      {tooltip.visible && (
+        <div className="tooltip" style={{ left: tooltip.x + 12, top: tooltip.y - 28 }}>
+          <div className="tooltip-name">{tooltip.name}</div>
+          <div className="tooltip-value">{tooltip.count} infections</div>
+        </div>
+      )}
+    </div>
   );
 }
