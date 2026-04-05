@@ -18,8 +18,11 @@ export default function EconomistBarChart({ data, width, height }) {
   const labelOffset = 7;
   const labelThreshold = 8;
   const maxValue = d3.max(data, (d) => d.count);
-  const maxValueGrid = Math.ceil(maxValue / 5) * 5 + 1;
-  const gridTicks = d3.range(0, maxValueGrid, 5);
+  const maxValueGrid = Math.ceil(maxValue / 5) * 5;
+  const gridTicks = d3.range(0, maxValueGrid + 1, 5);
+
+  console.log("maxValueGrid", maxValueGrid);
+  console.log("gridTicks", gridTicks);
 
   const xScale = d3.scaleLinear().domain([0, maxValueGrid]).range([0, width]);
 
@@ -30,7 +33,7 @@ export default function EconomistBarChart({ data, width, height }) {
     .padding(0.3);
 
   const header = (
-    <div className="header" style={{ width: "87.5%" }}>
+    <div className="header" style={{ width: 0.95 * width }}>
       <div className="headerLine" />
       <div className="headerBox" />
       <span className="title">Escape artists</span>
