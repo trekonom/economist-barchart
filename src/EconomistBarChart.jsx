@@ -18,7 +18,15 @@ function measureTextWidth(text) {
 export default function EconomistBarChart({ data, width, height }) {
   const containerRef = useRef(null);
   const [hoveredName, setHoveredName] = useState(null);
-  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "", count: 0, description: "", url: "" });
+  const [tooltip, setTooltip] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+    name: "",
+    count: 0,
+    description: "",
+    url: "",
+  });
 
   const labelOffset = 7;
   const labelThreshold = 8;
@@ -38,7 +46,7 @@ export default function EconomistBarChart({ data, width, height }) {
     .padding(0.3);
 
   const header = (
-    <div className="header" style={{ width: 0.95 * width }}>
+    <div className="header" style={{ width: width }}>
       <div className="headerLine" />
       <div className="headerBox" />
       <span className="title">Escape artists</span>
@@ -102,7 +110,15 @@ export default function EconomistBarChart({ data, width, height }) {
         }}
         onMouseMove={(e) => {
           const rect = containerRef.current.getBoundingClientRect();
-          setTooltip({ visible: true, x: e.clientX - rect.left, y: e.clientY - rect.top, name: d.name, count: d.count, description: d.description, url: d.url });
+          setTooltip({
+            visible: true,
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            name: d.name,
+            count: d.count,
+            description: d.description,
+            url: d.url,
+          });
         }}
       >
         <rect
@@ -133,7 +149,11 @@ export default function EconomistBarChart({ data, width, height }) {
           key={"label-" + i}
           x={labelOffset + xLabel}
           y={yLabel}
-          style={{ fill: labelColor, opacity: isActive ? 1 : 0.3, transition: "opacity 150ms ease" }}
+          style={{
+            fill: labelColor,
+            opacity: isActive ? 1 : 0.3,
+            transition: "opacity 150ms ease",
+          }}
           className="label"
         >
           {d.name}
@@ -143,7 +163,11 @@ export default function EconomistBarChart({ data, width, height }) {
   });
 
   return (
-    <div className="chart-container" ref={containerRef} style={{ position: "relative" }}>
+    <div
+      className="chart-container"
+      ref={containerRef}
+      style={{ position: "relative" }}
+    >
       {header}
       <svg
         width={width}
@@ -157,7 +181,10 @@ export default function EconomistBarChart({ data, width, height }) {
       </svg>
       {footer}
       {tooltip.visible && (
-        <div className="tooltip" style={{ left: tooltip.x + 12, top: tooltip.y - 28 }}>
+        <div
+          className="tooltip"
+          style={{ left: tooltip.x + 12, top: tooltip.y - 28 }}
+        >
           <div className="tooltip-name">{tooltip.name}</div>
           <div className="tooltip-value">{tooltip.count} infections</div>
           {tooltip.description && (
